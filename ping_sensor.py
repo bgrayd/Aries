@@ -3,6 +3,10 @@ class ping():
         self.port = port
         self.sensors = sensors
 
-    def read_feet():
+    def readFeet():
         #read it from the sensor port and convert to feet
-        return -1
+        return -2 #implement
+
+    def readCm():
+        #read distance from the sensor port and convert to feet
+        return -2 #implement
