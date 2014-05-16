@@ -110,7 +110,7 @@ def Dig():
     while(True):
         #digging from navigation area to wall
         while(frontPing < DistanceFromWallFront):
-            leftWheel.writePercent(diForwardSpeed)
+          leftWheel.writePercent(digForwardSpeed)
             rightWheel.writePercent(digForwardSpeed)
             conveyor.writePercent(conveyorSpeed)
             if(isFull()):
