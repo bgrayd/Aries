@@ -1,10 +1,17 @@
 class motor():
-    def __init__(port, motors):
+    def __init__(self,port, motors):
         self.port = port
         self.motors = motors
 
-    def writePercent(percent):
+    def writePercent(self,percent):
         if((percent > 100) or (percent < -100))
             return -1
-        #do what it needs to
-        return -2 #means not yet implemented
+        value = percent + 150 #I know 150 is the middle, and that 250 is possible
+        try:
+            file1 = open("/dev/servoblaster", "a")
+            file1.write(str(self.port)+"="+str(value))
+            file1.close()
+        except Exception as Ex:
+            file1.close()
+
+        
