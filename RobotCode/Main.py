@@ -50,17 +50,68 @@ def external_updater(externals):
 
 def location_tracking(deviceDrivers):
     #uses the accelerameter to keep track of its position
-
+    
 
 
 def orientation():
     #minimize two adjacent ping sensors' distance
-
-
+        '''
+        while robot is not aligned
+            turn robot left(or right?) until aligned
+        find max of four pings
+            if ping is max
+                assign both adjacent pings as ORIENTED_LEFT and OREINTED_RIGHT for centering robot
+        '''
     #roughly center horizontally
-
+        '''
+        will probably need to write turn left and turn right functions. Basically align robot a certain way
+        
+        def turnRight(max_ping)
+        
+        def turnLeft(max_ping)
+        
+        find max distance of two pings
+        if max ping is rear sensor
+            move backwards until front and back(non-oriented) pings are close to being equal 
+            (probably won't be exactly equal, so take a difference of the sensors and stop when that
+            distance hits a certain value. Can use front and back pings every time because the robot will always
+            have to navigate that way i.e. can only move forwards and backwards)
+            if rear sensor is ORIENTED_RIGHT
+                turn(align?)right
+            else
+                turn left
+                
+        if max ping is front sensor
+            move forwards until " "
+            if front sensor is ORIENTED_RIGHT
+                turn left
+            else 
+                turn right
+        
+        if max ping is left sensor
+            if left sensor is ORIENTED_RIGHT
+                turn left
+                move forwards " "
+                turn left
+            else
+                turn left
+                move forwards " "
+                turn right
+        
+        if max ping is right sensor
+            if right sensor is ORIENTED_RIGHT
+                turn right
+                move forwards " "
+                turn left
+            else
+                turn right
+                move forwards " "
+                turn right
+        '''
     #turn to face dig end
-
+        '''
+        not really necessary. Centering function handles this.
+        '''
 
     
 def toDigArea():
@@ -110,7 +161,7 @@ def Dig():
     while(True):
         #digging from navigation area to wall
         while(frontPing < DistanceFromWallFront):
-          leftWheel.writePercent(digForwardSpeed)
+            leftWheel.writePercent(digForwardSpeed)
             rightWheel.writePercent(digForwardSpeed)
             conveyor.writePercent(conveyorSpeed)
             if(isFull()):
@@ -126,7 +177,7 @@ def Dig():
         
         #digging from wall to navigation area
         while(backPing < DistanceAwayFromWallBack):
-            leftWheel.writePercent(diForwardSpeed)
+            leftWheel.writePercent(digForwardSpeed)
             rightWheel.writePercent(digForwardSpeed)
             conveyor.writePercent(conveyorSpeed)
             if(isFull()):
@@ -141,9 +192,14 @@ def Dig():
 
     
 def toDumpArea():
-
+    '''
+    move backwards until back ping sensor is within a certain range
+    '''
     
 def dump():
+    '''
+    have motor run until hopper has attempted to dump 3 times?
+    '''
 
 
 #returns a bool
