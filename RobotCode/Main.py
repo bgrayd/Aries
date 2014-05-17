@@ -187,6 +187,12 @@ def Dig():
         
         if(isFull()):
             break
+    '''
+    have scoop finish cycle so that extra dirt isn't being carried around
+    
+    while proximity sensor != True
+        run motor for scoop
+    '''
             
     
 
