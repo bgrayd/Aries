@@ -1,10 +1,11 @@
 from grovepi import *
 
 class Potentiometer():
-	def __init__(port, sensors):
+	def __init__(port, sensors, semaphore):
 		self.port = port
 		self.sensors = sensors
 		self.raw = -1
+		self.semaphore = semaphore
 
 	def getRaw():
 		return self.raw
