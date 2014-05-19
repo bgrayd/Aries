@@ -29,6 +29,7 @@ GPIO.setup(SW4, GPIO.input)
 
 def main():
     updater = threading.Thread(target=xboxInputUpdater, args=())
+    updater.start()
     while(True):   
         if((GPIO.input(SW1) or GPIO.input(SW2)) and (GPIO.input(SW3) or GPIO.input(SW4))):
             teleopCycle()
