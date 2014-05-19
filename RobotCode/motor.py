@@ -1,9 +1,10 @@
 class motor():
-    def __init__(self,port, motors):
+    def __init__(self,port, motors, semaphore):
         self.port = port
         self.motors = motors
+        self.semaphore = semaphore
 
-    def writePercent(self,percent):
+    def writePercent_Master(self,percent):
         if((percent > 100) or (percent < -100))
             return -1
         value = percent + 150 #I know 150 is the middle, and that 250 is possible
@@ -14,4 +15,7 @@ class motor():
         except Exception as Ex:
             file1.close()
 
-        
+    def writePercent(self, percent):
+        self.semaphore.acquire()
+        self.writePercent_Master(percent)
+        self.semaphore.release()

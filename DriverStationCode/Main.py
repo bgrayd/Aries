@@ -40,7 +40,7 @@ def main():
 
 def teleopCycle():
     global xboxValues
-    data = "teleop~"
+    data = "tele~"
     data += xboxValues["X1"] + "!"
     data += xboxValues["Y1"] + "@"
     data += xboxValues["X2"] + "#"
