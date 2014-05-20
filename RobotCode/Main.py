@@ -135,7 +135,7 @@ def teleop():
     #autonomous code
 def autonomous():
     global driverSemaphore
-    while(1): #will need to be changed
+    while(1):
         orientation()
         toDigArea()
         Dig()
@@ -294,16 +294,25 @@ def toDigArea():
         #check to see if conveyor assembly up
         #also need to add an if to make sure it does not get too far off target
         #will probably need to change to avoid jumpiness
-        #debug
-        if(deltaLeft < WHEELPINGDELTA):
-            rightWheel.writePercent(75)
+        if(deviceDrivers[RIGHTPING] <= 50):
+            turnLeft(30)
+        elif(deviceDrivers[LEFTPING] <= 50):
+            turnRight(30)
         else:
-            rightWheel.writePercent(25)
-            
-        if(deltaRight < WHEELPINGDELTA):
-            leftWheel.writePercent(75)
-        else:
-            leftWheel.writePercent(-25)
+            if(90-MAXORIENTATIONOFFSET < deviceDrivers[ACCMAG].getCalHeading() < 90 + MAXORIENTATIONOFFSETX):
+                if(deltaLeft < WHEELPINGDELTA):
+                    rightWheel.writePercent(75)
+                else:
+                    rightWheel.writePercent(25)
+                    
+                if(deltaRight < WHEELPINGDELTA):
+                    leftWheel.writePercent(75)
+                else:
+                    leftWheel.writePercent(-25)
+            elif(90-MAXORIENTATIONOFFSET > deviceDrivers[ACCMAG].getCalHeading()):
+                turnRight(90-deviceDrivers[ACCMAG].getCalHeading())
+            elif(90+MAXORIENTATIONOFFSET < deviceDrivers[ACCMAG].getCalHeading()):
+                turnLeft(deviceDrivers[ACCMAG].getHeading()-90)
             
         
 def Dig():
@@ -311,8 +320,8 @@ def Dig():
     digTurnSpeed = 75
     conveyorSpeed = 50
     turnDistance = 7
-    DistanceAwayFromWallFront = 50 #cm width/length of robot plus 2, need to get actual value
-    DistanceAwayFromWallBack
+    DistanceAwayFromWallFront = 50 #cm width/length of robot plus 2, need to get actual value look at
+    DistanceAwayFromWallBack = 50 #look at
     #debug
 
     leftPing=deviceDrivers[LEFTPING]
@@ -406,4 +415,3 @@ def isFull():
 
 
 main()
-    
