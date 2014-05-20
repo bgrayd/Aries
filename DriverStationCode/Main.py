@@ -61,7 +61,7 @@ def xboxInputUpdater():
     global xboxValues
     for event in xbox_read.event_stream(deadzone=12000):
         if event.key=='X1' or event.key=='X2' or event.key=='Y1' or event.key=='Y2':
-            value = math.log10(math.fabs(event.value))/JOYSTICKSCALAR * event.value/math.fabs(event.value)
+            value = int(math.log10(math.fabs(event.value))/JOYSTICKSCALAR * event.value/math.fabs(event.value))
             xboxValues[event.key] = value
         elif event.key=="LT" or event.key=="RT":
             value = (event.value>=128)

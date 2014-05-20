@@ -84,6 +84,7 @@ class LSM303DLM:
 		self.xm = 0
 		self.ym = 0
 		self.zm = 0
+		self.cal = 0
 
 	def enableDefault(self):
         #Enable Accelerometer
@@ -150,4 +151,14 @@ class LSM303DLM:
 	def update(self):
 		self.readRawMag()
 		self.readRawAccel()
+
+	def calibrate(self):
+                self.cal = 90-self.getHeading()
+                return self.cal
+
+        def getCalHeading(self):
+                cH = self.cal+self.getHeading()
+                if(cH >360):
+                        cH-=360
+                return cH
 		
