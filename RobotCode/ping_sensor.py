@@ -1,6 +1,6 @@
 from grovepi import *
 
-class pingDigi():
+class ping():
     def __init__(port, sensors, semaphore):
         self.port = port
         self.sensors = sensors
