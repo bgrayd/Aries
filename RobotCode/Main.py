@@ -158,63 +158,123 @@ def location_tracking(deviceDrivers):
 
 def orientation():
     #minimize two adjacent ping sensors' distance
-        '''
-        while robot is not aligned
-            turn robot left(or right?) until aligned
-        find max of four pings
-            if ping is max
-                assign both adjacent pings as ORIENTED_LEFT and OREINTED_RIGHT for centering robot
-        '''
+    leftPing=deviceDrivers[LEFTPING]
+    rightPing=deviceDrivers[RIGHTPING]
+    frontPing=deviceDrivers[FRONTPING]
+    rearPing=deviceDrivers[REARPING]
+    leftWheel=deviceDrivers[LEFTWHEEL]
+    rightWheel=deviceDrivers[RIGHTWHEEL]
+
+    '''
+    for turning, basically use the left or right ping as a reference
+    point. The the robot turns until the front ping sensor distance is 
+    relatively close to where the left or right ping was at. 20 is just 
+    being used as an arbitrary value and will likely have to be changed.
+    '''
+    def turnLeft():
+        turnt = leftPing.readCm()
+        frontDist = 0
+        while frontDist > turnt + 20 or frontDist < turnt - 20:
+            rightWheel.writePercent(75)
+            leftWheel.writePercent(-75)
+            frontDist = frontPing.readCm()
+
+    def turnRight():
+        turnt = rightPing.readCm()
+        frontDist = 0
+        while frontDist > turnt + 20 or frontDist < turnt -20:
+            rightWheel.writePercent(-75)
+            leftWheel.writePercent(75)
+            frontDist = frontPing.readCm()
+
+    aligned = False
+    '''
+    not really sure how well this would work. any other suggestions on minimizing the distances with the pings? 
+    I think the delta variables were used properly
+    '''
+    while aligned != True:
+        rightWheel.writePercent(75)
+        leftWheel.writePercent(-75)
+        leftDist = leftPing.readCm()
+        rightDist = rightPing.readCm()
+        deltaLeft = math.fabs(leftDist-WHEELPINGNORMAL)
+        deltaRight = math.fabs(rightDist-WHEELPINGNORMAL)
+        if deltaLeft > 70 or deltaRight > 70:   #arbitrary value that indicates when robot is no longer facing a wall at an angle
+            aligned = True
+        else:
+            aligned = False
     #roughly center horizontally
-        '''
-        will probably need to write turn left and turn right functions. Basically align robot a certain way
-        
-        def turnRight(max_ping)
-        
-        def turnLeft(max_ping)
-        
-        find max distance of two pings
-        if max ping is rear sensor
-            move backwards until front and back(non-oriented) pings are close to being equal 
-            (probably won't be exactly equal, so take a difference of the sensors and stop when that
-            distance hits a certain value. Can use front and back pings every time because the robot will always
-            have to navigate that way i.e. can only move forwards and backwards)
-            if rear sensor is ORIENTED_RIGHT
-                turn(align?)right
-            else
-                turn left
-                
-        if max ping is front sensor
-            move forwards until " "
-            if front sensor is ORIENTED_RIGHT
-                turn left
-            else 
-                turn right
-        
-        if max ping is left sensor
-            if left sensor is ORIENTED_RIGHT
-                turn left
-                move forwards " "
-                turn left
-            else
-                turn left
-                move forwards " "
-                turn right
-        
-        if max ping is right sensor
-            if right sensor is ORIENTED_RIGHT
-                turn right
-                move forwards " "
-                turn left
-            else
-                turn right
-                move forwards " "
-                turn right
-        '''
-    #turn to face dig end
-        '''
-        not really necessary. Centering function handles this.
-        '''
+    distances = []
+    frontDist = frontPing.readCm()
+    rightDist = rightPing.readCm()
+    rearDist = rearPing.readCm()
+    leftDist = leftPing.readCm()
+    distances.append(frontDist)
+    distances.append(rightDist)
+    distances.append(rearDist)
+    distances.append(leftDist)
+    maxDist = max(distances)
+
+    distDiff = 0   #indicates when robot is roughly centered on the field
+    if frontDist is maxDist:
+        if leftDist > rightDist:
+            turnLeft()
+            while distDiff > 30:  #arbitray, determine later
+                leftWheel.writePercent(75)
+                rightWheel.writePercent(75)
+                distDiff = fabs(frontPing.readCm()-backPing.readCm())
+            turnRight()
+        else:
+            turnRight()
+            while distDiff > 30:
+	        leftWheel.writePercent(75)
+	        rightWheel.writePercent(75)
+	        distDiff = fabs(frontPing.readCm()-backPing.readCm())
+            turnLeft()
+
+    if rightDist is maxDist:
+        if frontDist > rearDist:
+            while distDiff > 30:
+                leftWheel.writePercent(75)
+                rightWheel.writePercent(75)
+                distDiff = fabs(frontPing.readCm()-backPing.readCm())
+            turnRight()
+        else:
+            while distDiff > 30:
+                leftWheel.writePercent(-75)
+                rightWheel.writePercent(-75)
+                distDiff = fabs(frontPing.readCm()-backPing.readCm())
+            turnRight()
+    
+    if rearDist is maxDist:
+        if rightDist > leftDist:
+            turnRight()
+            while distDiff > 30:
+                leftWheel.writePercent(75)
+                rightWheel.writePercent(75)
+                distDiff = fabs(frontPing.readCm()-backPing.readCm())
+            turnRight()
+        else:
+            turnRight()
+            while distDiff > 30:
+                leftWheel.writePercent(-75)
+                rightWheel.writePercent(-75)
+                distDiff = fabs(frontPing.readCm()-backPing.readCm())
+            turnRight()
+    
+    if leftDist is maxDist:
+        if frontDist > rearDist:
+            while distDiff > 30:
+                leftWheel.writePercent(75)
+                rightWheel.writePercent(75)
+                distDiff = fabs(frontPing.readCm()-backPing.readCm())
+            turnLeft()
+        else:
+            while distDiff > 30:
+                leftWheel.writePercent(-75)
+                rightWheel.writePercent(-75)
+                distDiff = fabs(frontPing.readCm()-backPing.readCm())
+            turnLeft()
 
     
 def toDigArea():
