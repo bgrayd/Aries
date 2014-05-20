@@ -15,7 +15,9 @@ LEFTWHEEL=7
 RIGHTWHEEL=8
 CONVEYORTILT=9
 HOPPERMOTOR=10
+ACCMAG = 11
 
+MAXORIENTATIONOFFSET = 25
 WHEELPINGNORMAL=5 #will need to change test
 WHEELPINGDELTA=1 #will need to change test
 CONVEYORBELTSPEED = 75 #will need to change test
@@ -333,7 +335,8 @@ def Dig():
         if(isFull()):
             break
 
-        #logic for turning 90 degrees
+        #logic for turning 180 degrees
+        turnLeft(180)
         
         if(isFull()):
             break
@@ -346,7 +349,8 @@ def Dig():
             if(isFull()):
                 break
 
-        #logic for turning 90 degrees
+        #logic for turning 180 degrees
+            turnLeft(180)
         
         if(isFull()):
             break
@@ -356,8 +360,23 @@ def Dig():
     while proximity sensor != True
         run motor for scoop
     '''
-            
-    
+
+
+def turnLeft(angle):
+    newAngle=deviceDrivers[ACCMAG].getHeading()-angle
+    if(newAngle<0):
+        newAngle+=360
+    while(newAngle != deviceDrivers[ACCMAG]):
+        deviceDrivers[RIGHTWHEEL].writePercent(-50)
+        deviceDrivers[LEFTWHEEL].writePercent(50)
+
+def turnRight(angle):
+        newAngle=deviceDrivers[ACCMAG].getHeading()+angle
+    if(newAngle>360):
+        newAngle-=360
+    while(newAngle != deviceDrivers[ACCMAG]):
+        deviceDrivers[RIGHTWHEEL].writePercent(50)
+        deviceDrivers[LEFTWHEEL].writePercent(-50)
 
     
 def toDumpArea():
@@ -374,7 +393,10 @@ def dump():
 #returns a bool
 def inDigArea():
     #use location tracking and ping sensors to tell if it is in the digging area
-    pass
+    if(math.fabs(deviceDrivers[ACCMAG].getCalHeading())<=MAXORIENTATIONOFFSET):
+        if(deviceDrivers[frontPing].getCm()<2940):
+            return True
+    return False
 
 
 #returns boolean, if hopper is full
