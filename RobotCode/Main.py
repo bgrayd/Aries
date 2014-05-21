@@ -16,6 +16,8 @@ RIGHTWHEEL=8
 CONVEYORTILT=9
 HOPPERMOTOR=10
 ACCMAG = 11
+HOPPERPING = 12
+SCOOPPING = 13
 
 MAXORIENTATIONOFFSET = 25
 WHEELPINGNORMAL=5 #will need to change test
@@ -294,9 +296,9 @@ def toDigArea():
         #check to see if conveyor assembly up
         #also need to add an if to make sure it does not get too far off target
         #will probably need to change to avoid jumpiness
-        if(deviceDrivers[RIGHTPING] <= 50):
+        if(deviceDrivers[RIGHTPING].readCm() <= 50):
             turnLeft(30)
-        elif(deviceDrivers[LEFTPING] <= 50):
+        elif(deviceDrivers[LEFTPING].readCm() <= 50):
             turnRight(30)
         else:
             if(90-MAXORIENTATIONOFFSET < deviceDrivers[ACCMAG].getCalHeading() < 90 + MAXORIENTATIONOFFSETX):
@@ -345,7 +347,13 @@ def Dig():
             break
 
         #logic for turning 180 degrees
-        turnLeft(180)
+        turnLeft(90)
+
+        deviceDrivers[RIGHTWHEEL].writePercent(50)
+        deviceDrivers[LEFTWHEEL].writePercent(50)
+        time.sleep(.5)
+        turnLeft(90)
+
         
         if(isFull()):
             break
@@ -359,10 +367,19 @@ def Dig():
                 break
 
         #logic for turning 180 degrees
-            turnLeft(180)
+        turnLeft(90)
+        deviceDrivers[RIGHTWHEEL].writePercent(50)
+        deviceDrivers[LEFTWHEEL].writePercent(50)
+        time.sleep(.5)
+        turnLeft(90)
         
         if(isFull()):
             break
+
+    while(devicerDrivers[SCOOPPING]>3): #will need to change the number
+        deviceDrivers[CONVEYORBELT].writePercent(25)
+    deviceDrivers[CONVEYORBELT].writePercent(0)
+    
     '''
     have scoop finish cycle so that extra dirt isn't being carried around
     
@@ -397,6 +414,38 @@ def dump():
     '''
     have motor run until hopper has attempted to dump 3 times?
     '''
+    turnLeft(deviceDrivers[ACCMAG].getCalHeading())
+    even = (math.fabs(deviceDrivers[FRONTPING].readCm()-deviceDrivers[REARPING].readCm())<=5)
+    while(!even):
+        if(math.fabs(deviceDrivers[FRONTPING].readCm() < deviceDrivers[REARPING].readCm()):
+           deviceDrivers[RIGHTWHEEL].writePercent(50)
+           deviceDrivers[LEFTWHEEL].writePercent(50)
+        elif(math.fabs(deviceDrivers[FRONTPING].readCm() > deviceDrivers[REARPING].readCm())):
+           deviceDrivers[RIGHTWHEEL].writePercent(-50)
+           deviceDrivers[LEFTWHEEL].writePercent(-50)
+        even = (math.fabs(deviceDrivers[FRONTPING].readCm()-deviceDrivers[REARPING].readCm())<=5))
+
+    turnRight(90)
+    while(deviceDrivers[REARPING].readCm()>2):
+        deviceDrivers[RIGHTWHEEL].writePercent(-25)
+        deviceDrivers[LEFTWHEEL].writePercent(-25)
+
+    deviceDrivers[HOPPERMOTOR].writePercent(HOPPERSPEED)
+    
+    time.sleep(.1)
+    while(deviceDrivers[HOPPERPING].readCm() > 2):  #look at need to change to the distance from ping to hopper when down
+        pass
+
+    time.sleep(.1)
+    while(deviceDrivers[HOPPERPING].readCm() > 2):  #look at need to change to the distance from ping to hopper when down
+        pass
+
+    time.sleep(.1)
+    while(deviceDrivers[HOPPERPING].readCm() > 2):  #look at need to change to the distance from ping to hopper when down
+        pass
+
+    deviceDrivers[HOPPERMOTOR].writePercent(0)
+        
 
 
 #returns a bool
