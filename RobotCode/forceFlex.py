@@ -1,25 +1,23 @@
 from grovepi import *
 
-class Potentiometer():
+class forceFlex():
 	def __init__(port, sensors, semaphore):
 		self.port = port
 		self.sensors = sensors
 		self.raw = -1
 		self.semaphore = semaphore
+		self.caledAmount = 1000 #may not be correct, but best I can do without the robot on hand
 
 	def getRaw():
 		return self.raw
 
-	def getDegrees():
-		return self.raw*360/1023
+        def getFull():
+            self.getRaw()
+            return self.raw <= self.caledAmount
 
 	def update():
 		self.raw = analogRead(self.port)
 		return self.raw
-
-	def readDegrees():
-		self.update()
-		return self.getDegrees()
 		
 	def readRaw():
 		self.update()

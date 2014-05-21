@@ -1,5 +1,5 @@
 import threading, subprocess, math
-import ping_sensor, motors
+import ping_sensor, motors, potentiometer, forceflex
 from UDProboSERVER import *
 import Queue
 
@@ -18,6 +18,25 @@ HOPPERMOTOR=10
 ACCMAG = 11
 HOPPERPING = 12
 SCOOPPING = 13
+CONVEYORANGLE = 14
+FORCEFLEX = 15
+
+#these are wrong, fill them in with the correct values
+FRONTPINGPORT=0          #fill in
+RIGHTPINGPORT=1          #fill in
+REARPINGPORT=2           #fill in
+LEFTPINGPORT=3           #fill in
+LEFTWHEELPINGPORT=4      #fill in
+RIGHTWHEELPINGPORT=5     #fill in
+CONVEYORBELTPORT=0       #fill in
+LEFTWHEELPORT=1          #fill in
+RIGHTWHEELPORT=2         #fill in
+CONVEYORTILTPORT=3       #fill in
+HOPPERMOTORPORT=4        #fill in
+HOPPERPINGPORT = 5       #fill in
+SCOOPPINGPORT = 6        #fill in
+CONVEYORANGLEPORT = 1    #fill in
+FORCEFLEXPORT = 2        #fill in
 
 
 MAXORIENTATIONOFFSET = 25
@@ -45,6 +64,23 @@ def main():
     deviceDrivers={}
 
     #initialize the drivers for each device
+    deviceDrivers[FRONTPING] = ping_sensor.ping(FRONTPINGPORT, deviceDrivers, driverSemaphore)
+    deviceDrivers[RIGHTPING] = ping_sensor.ping(RIGHTPINGPORT, deviceDrivers, driverSemaphore)
+    deviceDrivers[REARPING] = ping_sensor.ping(REARPINGPORT, deviceDrivers, driverSemaphore)
+    deviceDrivers[LEFTPING] = ping_sensor.ping(LEFTPINGPORT, deviceDrivers, driverSemaphore)
+    deviceDrivers[LEFTWHEELPING] = ping_sensor.ping(LEFTWHEELPINGPORT, deviceDrivers, driverSemaphore)
+    deviceDrivers[RIGHTWHEELPING] = ping_sensor.ping(RIGHTWHEELPINGPORT, deviceDrivers, driverSemaphore)
+    deviceDrivers[CONVEYORBELT] = motor.motor(CONVEYORBELTPORT, deviceDrivers, driverSemaphore)
+    deviceDrivers[LEFTWHEEL] = motor.motor(LEFTWHEELPORT, deviceDrivers, driverSemaphore)
+    deviceDrivers[RIGHTWHEEL] = motor.motor(RIGHTWHEELPORT, deviceDrivers, driverSemaphore)
+    deviceDrivers[CONVEYORTILT] = motor.motor(CONVEYORTILTPORT, deviceDrivers, driverSemaphore)
+    deviceDrivers[HOPPERMOTOR] = motor.motor(HOPPERMOTORPORT, deviceDrivers, driverSemaphore)
+    deviceDrivers[ACCMAG] = LSM303DLM.LSM303DLM()
+    deviceDrivers[HOPPERPING] = ping_sensor.ping(HOPPERPINGPORT, deviceDrivers, driverSemaphore)
+    deviceDrivers[SCOOPPING] = ping_sensor.ping(SCOOPPINGPORT, deviceDrivers, driverSemaphore)
+    deviceDrivers[CONVEYORANGLE] = potentiometer.Potentiometer(CONVETORANGLEPORT, deviceDrivers, driverSemaphore)
+    deviceDrivers[FORCEFLEX] = forceFlex.forceFlex(FORCEFLEXPORT, deviceDrivers, driverSemaphore)
+    
 
     
     #launches the threads
@@ -409,6 +445,39 @@ def toDumpArea():
     '''
     move backwards until back ping sensor is within a certain range
     '''
+    #will need to add code to keep it mostly facing the correct direction
+    leftPing=deviceDrivers[LEFTWHEELPING]
+    rightPing=deviceDrivers[RIGHTWHEELPING]
+    leftWheel=deviceDrivers[LEFTWHEEL]
+    rightWheel=deviceDrivers[RIGHTWHEEL]
+    while(not inDumpArea()):
+        leftDist = leftPing.readCm()
+        rightDist = rightPing.readCm()
+        deltaLeft = math.fabs(leftDist-WHEELPINGNORMAL)
+        deltaRight = math.fabs(rightDist-WHEELPINGNORMAL)
+        #add code to make sure it doesn't hit walls
+        #check to see if conveyor assembly up
+        #also need to add an if to make sure it does not get too far off target
+        #will probably need to change to avoid jumpiness
+        if(deviceDrivers[RIGHTPING].readCm() <= 50):
+            turnLeft(30)
+        elif(deviceDrivers[LEFTPING].readCm() <= 50):
+            turnRight(30)
+        else:
+            if(270-MAXORIENTATIONOFFSET < deviceDrivers[ACCMAG].getCalHeading() < 270 + MAXORIENTATIONOFFSETX):
+                if(deltaLeft < WHEELPINGDELTA):
+                    rightWheel.writePercent(75)
+                else:
+                    rightWheel.writePercent(25)
+                    
+                if(deltaRight < WHEELPINGDELTA):
+                    leftWheel.writePercent(75)
+                else:
+                    leftWheel.writePercent(-25)
+            elif(270-MAXORIENTATIONOFFSET > deviceDrivers[ACCMAG].getCalHeading()):
+                turnRight(90-deviceDrivers[ACCMAG].getCalHeading())
+            elif(270+MAXORIENTATIONOFFSET < deviceDrivers[ACCMAG].getCalHeading()):
+                turnLeft(deviceDrivers[ACCMAG].getHeading()-90)
     
 def dump():
     '''
@@ -451,15 +520,24 @@ def dump():
 #returns a bool
 def inDigArea():
     #use location tracking and ping sensors to tell if it is in the digging area
-    if(math.fabs(deviceDrivers[ACCMAG].getCalHeading())<=MAXORIENTATIONOFFSET):
+    if(math.fabs(deviceDrivers[ACCMAG].getCalHeading()-90)<=MAXORIENTATIONOFFSET):
         if(deviceDrivers[frontPing].getCm()<2940):
+            return True
+    return False
+
+
+#returns a bool
+def inDumpArea():
+    #use location tracking and ping sensors to tell if it is in the digging area
+    if(math.fabs(270-deviceDrivers[ACCMAG].getCalHeading())<=MAXORIENTATIONOFFSET):
+        if(deviceDrivers[frontPing].getCm()<1500):
             return True
     return False
 
 
 #returns boolean, if hopper is full
 def isFull():
-    pass
+    return deviceDrivers[FORCEFLEX].getFull()
 
 
 
