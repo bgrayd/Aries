@@ -19,6 +19,7 @@ ACCMAG = 11
 HOPPERPING = 12
 SCOOPPING = 13
 
+
 MAXORIENTATIONOFFSET = 25
 WHEELPINGNORMAL=5 #will need to change test
 WHEELPINGDELTA=1 #will need to change test
@@ -353,7 +354,6 @@ def Dig():
         deviceDrivers[LEFTWHEEL].writePercent(50)
         time.sleep(.5)
         turnLeft(90)
-
         
         if(isFull()):
             break
