@@ -38,7 +38,6 @@ SCOOPPINGPORT = 6        #fill in
 CONVEYORANGLEPORT = 1    #fill in
 FORCEFLEXPORT = 2        #fill in
 
-
 MAXORIENTATIONOFFSET = 25
 WHEELPINGNORMAL=5 #will need to change test
 WHEELPINGDELTA=1 #will need to change test
