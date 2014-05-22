@@ -45,6 +45,8 @@ CONVEYORBELTSPEED = 75 #will need to change test
 HOPPERSPEED = 50 #will need to change test
 CONVEYORTILTSPEEDFORWARD = 50 #will need to change test
 CONVEYORTILTSPEEDBACK = -CONVEYORTILTSPEEDFORWARD
+CONVEYORBACK = 100 #angle of conveyor belt when fully back, need to change
+CONVEYORFORWARD = 125 #angle of conveyor belt when fully forward, need to change
 
 driverSemaphore = threading.Semaphore()
 
@@ -328,9 +330,12 @@ def toDigArea():
         rightDist = rightPing.readCm()
         deltaLeft = math.fabs(leftDist-WHEELPINGNORMAL)
         deltaRight = math.fabs(rightDist-WHEELPINGNORMAL)
-        #add code to make sure it doesn't hit walls
         #check to see if conveyor assembly up
-        #also need to add an if to make sure it does not get too far off target
+        if(deviceDrivers[CONVEYORANGLE]>CONVEYORBACK):
+            deviceDrivers[CONVEYORTILT].writePercent(25)
+        else:
+            deviceDrivers[CONVEYORTILT].writePercent(0)
+        
         #will probably need to change to avoid jumpiness
         if(deviceDrivers[RIGHTPING].readCm() <= 50):
             turnLeft(30)
@@ -454,9 +459,13 @@ def toDumpArea():
         rightDist = rightPing.readCm()
         deltaLeft = math.fabs(leftDist-WHEELPINGNORMAL)
         deltaRight = math.fabs(rightDist-WHEELPINGNORMAL)
-        #add code to make sure it doesn't hit walls
-        #check to see if conveyor assembly up
-        #also need to add an if to make sure it does not get too far off target
+        
+        #check to see if conveyor assembly down
+        if(deviceDrivers[CONVEYORANGLE]<CONVEYORFORWARD):
+            deviceDrivers[CONVEYORTILT].writePercent(-25)
+        else:
+            deviceDrivers[CONVEYORTILT].writePercent(0)
+
         #will probably need to change to avoid jumpiness
         if(deviceDrivers[RIGHTPING].readCm() <= 50):
             turnLeft(30)
